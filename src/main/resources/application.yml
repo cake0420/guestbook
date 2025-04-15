@@ -10,6 +10,11 @@ spring:
       minimum-idle: 5 # 최소 유휴 커넥션 수
   profiles:
     active: dev
+  springdoc:
+    swagger-ui:
+      path: /swagger-ui.html
+#    api-docs:
+#      path: /v3/api-docs
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml
   type-aliases-package: com.cake7.guestbook.domain
