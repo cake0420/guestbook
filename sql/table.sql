@@ -1,6 +1,6 @@
 CREATE TABLE user (
        id VARCHAR(36) PRIMARY KEY,
-       provider VARCHAR(20) NOT NULL,
+       provider VARCHAR(50) NOT NULL,
        provider_id VARCHAR(100) NOT NULL,
        email VARCHAR(100),
        name VARCHAR(100),

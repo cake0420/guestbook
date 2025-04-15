@@ -54,8 +54,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                             providerId,
                             email,
                             name,
-                            profileImage,
                             "ROLE_USER",
+                            profileImage,
                             now,
                             now
                     );

@@ -20,8 +20,8 @@ public interface UserMapper {
     Optional<User> findByProviderAndProviderId(@Param("provider") String providerId, @Param("providerId") String providerName);
 
     @Insert("""
-        INSERT INTO user (id, name, role, provider, provider_id, email, profile_image_url, created_at, updated_at)
-        VALUES (#{id}, #{provider}, #{providerId}, #{email}, #{name}, #{profile_image_url}, #{role}, #{createdAt}, #{updatedAt})
+        INSERT INTO user (id, provider, provider_id, email, name, role, profile_image_url, created_at, updated_at)
+        VALUES (#{id}, #{provider}, #{providerId}, #{email}, #{name}, #{role}, #{profile_image_url}, #{createdAt}, #{updatedAt})
 """)
     void save(User user);
 }

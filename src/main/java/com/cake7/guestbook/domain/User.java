@@ -16,8 +16,8 @@
         private final String role;
 
 
-        public User(String id, String name, String provider,
-                    String providerId, String email, String profileImage, String roleUser,
+        public User(String id,  String provider,
+                    String providerId, String email, String name, String roleUser, String profileImage,
                     LocalDateTime createdAt, LocalDateTime updatedAt) {
             super(createdAt, updatedAt);
             this.id = id;
