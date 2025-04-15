@@ -1,0 +1,15 @@
+server:
+  port: 8080 # 충돌 문제 시 수정
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      maximum-pool-size: 10 # 최대 커넥션 수
+      minimum-idle: 5 # 최소 유휴 커넥션 수
+  profiles:
+    active: dev
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.cake7.guestbook.domain
+  configuration:
+    map-underscore-to-camel-case: true
