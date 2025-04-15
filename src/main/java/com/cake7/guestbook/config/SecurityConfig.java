@@ -13,8 +13,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @Configuration
 @EnableWebSecurity // 스프링 시큐리티 필터가 스프링 필터체인에 등록이 된다
 @EnableMethodSecurity (securedEnabled = true, prePostEnabled = true)
@@ -32,18 +30,22 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorizeRequests -> authorizeRequests
                     .requestMatchers("/", "/v1/sign-in", "/v1/sign-up", "/swagger-ui/**", "/v3/api-docs/**").permitAll()  // 순서 중요: permitAll 먼저
+                    .requestMatchers("/login/oauth2/code/google/**").permitAll()
+                    .requestMatchers("/oauth2/authorization/google/**").permitAll()
                     .requestMatchers("/v1/user/**").hasRole("USER")
                     .requestMatchers("/v1/admin/**").hasRole("ADMIN")
                     .anyRequest().authenticated())
+                .oauth2Login(oauth2 -> oauth2
+//                        .loginPage()
+                        .defaultSuccessUrl("/", true)
+                )
                 .formLogin(form -> form
-//                        .loginPage("/")  // 커스텀 로그인 페이지 URL 설정
-                        .loginProcessingUrl("/v1/sign-in")  // 로그인 요청 URL
+                        .loginPage("/")  // 커스텀 로그인 페이지 URL 설정
+                        .loginProcessingUrl("/login/oauth2/code/google")  // 로그인 요청 URL
                         .defaultSuccessUrl("/", true)  // 로그인 성공 후 리디렉션할 페이지 설정
                         .failureUrl("/sign-in?error=true")  // 로그인 실패 시 리디렉션할 페이지 설정
                         .permitAll()  // 로그인 페이지는 누구나 접근 가능
-                );;
-        http.httpBasic(withDefaults());// 기본 로그인 폼 사용 (필요에 따라 커스터마이징)
-// HTTP Basic 인증 사용 (필요에 따라 제거 또는 변경)
+                );
 
         return http.build();
     }

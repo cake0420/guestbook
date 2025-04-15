@@ -13,7 +13,7 @@ import java.util.Map;
 @Tag(name = "User API", description = "사용자 관련 기능 제공")
 @RestController
 @RequestMapping("/api/test/users")
-public class UserController {
+public class TestUserController {
 
     @Operation(summary = "모든 사용자 조회", description = "등록된 모든 사용자의 이름을 조회합니다.")
     @GetMapping
@@ -22,11 +22,12 @@ public class UserController {
     }
 
     @PostMapping("/post")
-    @Operation(summary = "사용자 등록")
+    @Operation(summary = "사용자 등록", description = "사용자 이름과 나이를 등록합니다.")
     public ResponseEntity<String> createUser(@RequestBody TestUserDTO userDTO) {
         return ResponseEntity.ok("사용자 등록: " + userDTO.name());
     }
 
+    @Operation(summary = "사용자 아이디 조회", description = "사용자 아이디로 사용자를 조회합니다.")
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Long>> getPost(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("id",id));
