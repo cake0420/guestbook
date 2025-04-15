@@ -1,6 +1,8 @@
 server:
   port: 8080 # 충돌 문제 시 수정
 spring:
+  thymeleaf:
+    view-names: thymeleaf/*
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
@@ -13,3 +15,4 @@ mybatis:
   type-aliases-package: com.cake7.guestbook.domain
   configuration:
     map-underscore-to-camel-case: true
+
