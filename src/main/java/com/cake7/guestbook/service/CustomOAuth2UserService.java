@@ -13,6 +13,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.UUID;
@@ -44,16 +45,19 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             throw new OAuth2AuthenticationException(new OAuth2Error("Missing essential user info from OAuth provider"));
         }
         // 기존 사용자 조회
+        LocalDateTime now = LocalDateTime.now();
         User user = userMapper.findByProviderAndProviderId(provider, providerId)
                 .orElseGet(() -> {
                     User newUser = new User(
-                            UUID.randomUUID(),
+                            UUID.randomUUID().toString(),
                             provider,
                             providerId,
                             email,
                             name,
                             profileImage,
-                            "ROLE_USER"
+                            "ROLE_USER",
+                            now,
+                            now
                     );
                     userMapper.save(newUser);
                     return newUser;

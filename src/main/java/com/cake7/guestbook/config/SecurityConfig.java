@@ -29,7 +29,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                    .requestMatchers("/", "/v1/sign-in", "/v1/sign-up", "/swagger-ui/**", "/v3/api-docs/**").permitAll()  // 순서 중요: permitAll 먼저
+                    .requestMatchers("/", "/index.html", "/v1/sign-in", "/v1/sign-up", "/swagger-ui/**", "/v3/api-docs/**").permitAll()  // 순서 중요: permitAll 먼저
                     .requestMatchers("/login/oauth2/code/google/**").permitAll()
                     .requestMatchers("/oauth2/authorization/google/**").permitAll()
                     .requestMatchers("/v1/user/**").hasRole("USER")
@@ -41,9 +41,9 @@ public class SecurityConfig {
                 )
                 .formLogin(form -> form
                         .loginPage("/")  // 커스텀 로그인 페이지 URL 설정
-                        .loginProcessingUrl("/login/oauth2/code/google")  // 로그인 요청 URL
+                        .loginProcessingUrl("/login")  // 로그인 요청 URL
                         .defaultSuccessUrl("/", true)  // 로그인 성공 후 리디렉션할 페이지 설정
-                        .failureUrl("/sign-in?error=true")  // 로그인 실패 시 리디렉션할 페이지 설정
+                        .failureUrl("/?error=true")  // 로그인 실패 시 리디렉션할 페이지 설정
                         .permitAll()  // 로그인 페이지는 누구나 접근 가능
                 );
 

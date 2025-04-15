@@ -16,6 +16,7 @@ spring:
 #    api-docs:
 #      path: /v3/api-docs
 mybatis:
+  type-handlers-package: com.cake7.guestbook.config.mybatis
   mapper-locations: classpath:mapper/**/*.xml
   type-aliases-package: com.cake7.guestbook.domain
   configuration:
