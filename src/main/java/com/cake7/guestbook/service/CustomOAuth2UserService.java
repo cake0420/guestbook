@@ -1,7 +1,6 @@
 package com.cake7.guestbook.service;
 
 import com.cake7.guestbook.domain.User;
-import com.cake7.guestbook.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -13,7 +12,8 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.UUID;
@@ -22,7 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User>  {
 
-    private final UserMapper userMapper;
+    private final UserServiceImpl userServiceImpl;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -45,10 +45,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             throw new OAuth2AuthenticationException(new OAuth2Error("Missing essential user info from OAuth provider"));
         }
         // 기존 사용자 조회
-        LocalDateTime now = LocalDateTime.now();
-        User user = userMapper.findByProviderAndProviderId(provider, providerId)
-                .orElseGet(() -> {
-                    User newUser = new User(
+        ZonedDateTime utcNow = ZonedDateTime.now(ZoneOffset.UTC);
+
+        User newUser = new User(
                             UUID.randomUUID().toString(),
                             provider,
                             providerId,
@@ -56,16 +55,18 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                             name,
                             "ROLE_USER",
                             profileImage,
-                            now,
-                            now
+                            utcNow,
+                            utcNow
                     );
-                    userMapper.save(newUser);
-                    return newUser;
-                });
+        try {
+            userServiceImpl.updateOrSaveUser(newUser);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         // Spring Security 세션에 저장할 사용자 객체 리턴
         return new DefaultOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority(user.getRole())),
+                Collections.singleton(new SimpleGrantedAuthority(newUser.getRole())),
                 oAuth2User.getAttributes(),
                 userNameAttribute
         );

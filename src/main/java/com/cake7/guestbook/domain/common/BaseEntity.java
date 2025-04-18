@@ -1,17 +1,14 @@
 package com.cake7.guestbook.domain.common;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 
 @Getter
+@RequiredArgsConstructor
 public class BaseEntity {
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
-
-    public BaseEntity(LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
+    private final ZonedDateTime createdAt;
+    private final ZonedDateTime updatedAt;
 }

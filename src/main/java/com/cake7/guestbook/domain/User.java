@@ -3,7 +3,7 @@
     import com.cake7.guestbook.domain.common.BaseEntity;
     import lombok.Getter;
 
-    import java.time.LocalDateTime;
+    import java.time.ZonedDateTime;
 
     @Getter
     public class User extends BaseEntity {
@@ -16,9 +16,9 @@
         private final String role;
 
 
-        public User(String id,  String provider,
+        public User(String id, String provider,
                     String providerId, String email, String name, String roleUser, String profileImage,
-                    LocalDateTime createdAt, LocalDateTime updatedAt) {
+                    ZonedDateTime createdAt, ZonedDateTime updatedAt) {
             super(createdAt, updatedAt);
             this.id = id;
             this.name = name;
