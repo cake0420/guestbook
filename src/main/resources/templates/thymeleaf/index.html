@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security" lang="ko">
 <head>
   <title>회원가입</title>
 </head>
@@ -23,6 +24,14 @@
 </form>
 
 <a th:href="@{/oauth2/authorization/google}">Google 로그인</a>
+
+<!-- 로그인한 사용자에게만 표시 -->
+<div sec:authorize="isAuthenticated()">
+  <h2>환영합니다, <span sec:authentication="principal.attributes['name']"></span>님!</h2>
+  <form th:action="@{/logout}" method="post">
+    <button type="submit">로그아웃</button>
+  </form>
+</div>
 
 <p><a href="/">돌아가기</a></p>
 </body>

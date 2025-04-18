@@ -45,7 +45,14 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/", true)  // 로그인 성공 후 리디렉션할 페이지 설정
                         .failureUrl("/?error=true")  // 로그인 실패 시 리디렉션할 페이지 설정
                         .permitAll()  // 로그인 페이지는 누구나 접근 가능
-                );
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .permitAll()
+                );;
 
         return http.build();
     }
