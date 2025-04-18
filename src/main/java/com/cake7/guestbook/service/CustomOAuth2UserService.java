@@ -2,6 +2,8 @@ package com.cake7.guestbook.service;
 
 import com.cake7.guestbook.domain.User;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -21,7 +23,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User>  {
-
+    private static final Logger logger = LogManager.getLogger(CustomOAuth2UserService.class.getName());
     private final UserServiceImpl userServiceImpl;
 
     @Override
@@ -42,6 +44,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         if (Objects.requireNonNull(providerId).isEmpty() ||
                 Objects.requireNonNull(email).isEmpty()) {
+            logger.error("provider or email is empty");
             throw new OAuth2AuthenticationException(new OAuth2Error("Missing essential user info from OAuth provider"));
         }
         // 기존 사용자 조회

@@ -12,4 +12,4 @@ logging:
     com:
       cake7:
         guestbook:
-          mapper: ERROR # mapper 패키지의 로깅 레벨을 DEBUG로 설정 (DEV)
+          mapper: INFO # mapper 패키지의 로깅 레벨을 DEBUG로 설정 (DEV)
