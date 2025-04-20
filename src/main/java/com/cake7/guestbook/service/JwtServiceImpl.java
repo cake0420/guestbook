@@ -27,6 +27,8 @@ public class JwtServiceImpl implements JwtService {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
         String email = oAuth2User.getAttribute("email");
+//        String subject = oAuth2User.getAttribute("sub");
+        String authorities = oAuth2User.getAttribute("authorities");
 
         ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
         ZonedDateTime expiration = now.plus(jwtConfig.getExpiration(), ChronoUnit.MILLIS);
@@ -35,6 +37,8 @@ public class JwtServiceImpl implements JwtService {
         return Jwts.builder()
                 .subject(email)
                 .claim("email",email)
+//                .claim("sub",subject)
+                .claim("authorities",authorities)
                 .issuedAt(Date.from(now.toInstant()))
                 .expiration(Date.from(expiration.toInstant()))
                 .signWith(jwtConfig.secretKey())

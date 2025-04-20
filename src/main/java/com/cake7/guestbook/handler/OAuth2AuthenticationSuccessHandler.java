@@ -2,6 +2,7 @@ package com.cake7.guestbook.handler;
 
 import com.cake7.guestbook.service.JwtService;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +25,14 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         response.setHeader("Authorization", "Bearer " + token);
 
+        Cookie cookie = new Cookie("jwt_token", token);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(3600);
+        response.addCookie(cookie);
+
         String targetUrl = UriComponentsBuilder.fromUriString("/").build().toUriString();
 
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
-
     }
 }
