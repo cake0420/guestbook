@@ -2,11 +2,13 @@ package com.cake7.guestbook.controller;
 
 import com.cake7.guestbook.dto.TestTokenDTO;
 import com.cake7.guestbook.service.JwtServiceImpl;
+import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,11 +23,36 @@ public class TestAuthController {
 
     @Operation(summary = "토큰 검증", description = "JWT 토큰의 유효성을 검증합니다.")
     @GetMapping("/validate")
-    public ResponseEntity<TestTokenDTO> validateToken(Authentication authentication) {
-        String token = jwtService.generateToken(authentication);
+    public ResponseEntity<TestTokenDTO> validateToken(HttpServletRequest request) {
+        // Extract token specifically from cookies
+        String token = extractTokenFromCookie(request);
+
         if (token != null && !token.isEmpty()) {
-            return ResponseEntity.ok(new TestTokenDTO(true, "valid"));
+            boolean isValid = jwtService.validateToken(token);
+            if (isValid) {
+                // If valid, we can also extract and return some user information
+                Claims claims = jwtService.parseToken(token);
+                String email = claims.getSubject();
+                String authorities = (String) claims.get("authorities");
+
+                return ResponseEntity.ok(new TestTokenDTO(true,
+                        "Valid token for user: " + email + " with authorities: " + authorities));
+            }
         }
-        return  ResponseEntity.badRequest().body(new TestTokenDTO(false, "invalid"));
+
+        return ResponseEntity.badRequest().body(new TestTokenDTO(false, "Invalid or missing token"));
     }
+
+    private String extractTokenFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("jwt_token")) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
 }
