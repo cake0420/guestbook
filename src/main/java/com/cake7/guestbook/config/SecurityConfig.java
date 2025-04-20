@@ -1,5 +1,8 @@
 package com.cake7.guestbook.config;
 
+import com.cake7.guestbook.filter.JwtAuthenticationFilter;
+import com.cake7.guestbook.handler.OAuth2AuthenticationSuccessHandler;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
@@ -12,8 +15,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -21,7 +26,11 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity // 스프링 시큐리티 필터가 스프링 필터체인에 등록이 된다
 @EnableMethodSecurity (securedEnabled = true, prePostEnabled = true)
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
     @Bean
     public DefaultMethodSecurityExpressionHandler methodSecurityExpressionHandler() {
@@ -36,6 +45,9 @@ public class SecurityConfig {
         http.
                     cors(Customizer.withDefaults()) // ✅ CORS 활성화
                     .csrf(AbstractHttpConfigurer::disable)
+                    .sessionManagement(session
+                        -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                     .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                     .requestMatchers("/api/test/**").permitAll()
                     .requestMatchers("/", "/v1/sign-in", "/v1/sign-up", "/swagger-ui/**", "/v3/api-docs/**").permitAll()  // 순서 중요: permitAll 먼저
@@ -45,8 +57,7 @@ public class SecurityConfig {
                     .requestMatchers("/v1/admin/**").hasRole("ADMIN")
                     .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
-//                        .loginPage()
-                        .defaultSuccessUrl("/", true)
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
                 )
                 .formLogin(form -> form
                         .loginPage("/")  // 커스텀 로그인 페이지 URL 설정
@@ -61,7 +72,8 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
-                );;
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
