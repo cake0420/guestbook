@@ -17,7 +17,7 @@ public interface RefreshTokenMapper {
     void save(RefreshToken refreshToken);
 
     @Select("""
-        SELECT * FROM refresh_token WHERE id = #{id}")"
+        SELECT * FROM refresh_token WHERE id = #{id}
     """)
     Optional<RefreshToken> findById(String id);
 
