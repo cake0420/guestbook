@@ -86,9 +86,12 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
             return new RefreshTokenResponseDTO(newAccessToken, newRefreshToken,
                     "Bearer", 60 * 60);
 
+        } catch (TokenException e) {
+            logger.error("during regenerate refresh token {}", e.getMessage());
+            throw new TokenException("during regenerate refresh token error: "+ e.getMessage());
         } catch (Exception e) {
-            logger.error("during get refresh token {}", e.getMessage());
-            throw new Exception("during get refresh token error: "+ e.getMessage());
+            logger.error("during create refresh token error {}", e.getMessage());
+            throw new Exception("during create refresh token error: "+ e.getMessage());
         }
     }
 }

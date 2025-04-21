@@ -17,9 +17,13 @@ public interface RefreshTokenMapper {
     void save(RefreshToken refreshToken);
 
     @Select("""
-        SELECT * FROM refresh_token WHERE id = #{id}
+        SELECT re.id
+        FROM refresh_token re
+        INNER JOIN user u ON u.id = re.user_id
+        WHERE provider_id = #{providerId}
+        LIMIT 1
     """)
-    Optional<RefreshToken> findById(String id);
+    Optional<RefreshToken> findById(String providerId);
 
     @Update("""
         UPDATE refresh_token
