@@ -32,7 +32,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
             response.setHeader("Authorization", "Bearer " + token);
 
-            Cookie cookie = new Cookie("jwt_token", refreshToken);
+            Cookie cookie = new Cookie("jwt_token", token);
             cookie.setHttpOnly(true);
             cookie.setPath("/");
             cookie.setMaxAge(3600);

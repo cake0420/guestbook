@@ -9,9 +9,10 @@ import java.util.Optional;
 @Mapper
 @Repository
 public interface RefreshTokenMapper {
+
     @Insert("""
-        INSERT INTO refresh_token(id, user_id, created_at, expired_at)\s
-        VALUES (#{id}, #{userId}, #{createdAt}, #{expiredAt})
+        INSERT INTO refresh_token(id, user_id, created_at, expired_at, used)\s
+        VALUES (#{id}, #{userId}, #{createdAt}, #{expiredAt}, #{used})\s
    \s""")
     void save(RefreshToken refreshToken);
 

@@ -15,11 +15,11 @@ public class RefreshToken {
     private String id;
     private String userId;
     private ZonedDateTime createdAt;
-    private ZonedDateTime expiresAt;
+    private ZonedDateTime expiredAt;
     private boolean used;
 
     public boolean isExpired() {
-        return expiresAt.isBefore(ZonedDateTime.now());
+        return expiredAt.isBefore(ZonedDateTime.now());
     }
 
     public void markUsed() {

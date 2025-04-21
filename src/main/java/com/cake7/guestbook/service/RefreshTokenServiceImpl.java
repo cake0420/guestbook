@@ -4,6 +4,7 @@ import com.cake7.guestbook.domain.RefreshToken;
 import com.cake7.guestbook.dto.RefreshTokenResponseDTO;
 import com.cake7.guestbook.exception.TokenException;
 import com.cake7.guestbook.mapper.RefreshTokenMapper;
+import com.cake7.guestbook.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,29 +22,29 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private static final Logger logger = LogManager.getLogger(RefreshTokenService.class);
     private final RefreshTokenMapper refreshTokenMapper;
     private final JwtServiceImpl jwtService;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String createRefreshToken(Authentication authentication) throws Exception {
         try {
-            String userId = authentication.getName();
+            String userId = userMapper.findByProviderId(authentication.getName());
 
             String refreshTokenId = UUID.randomUUID().toString();
             ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-            ZonedDateTime expiresAt = now.plusDays(1); // 14일 유효기간
-
+            ZonedDateTime expiresAt = now.plusDays(1);
             RefreshToken refreshToken = RefreshToken.builder()
                     .id(refreshTokenId)
                     .userId(userId)
                     .createdAt(now)
-                    .expiresAt(expiresAt)
+                    .expiredAt(expiresAt)
                     .used(false)
                     .build();
 
             refreshTokenMapper.save(refreshToken);
             return refreshTokenId;
         } catch (Exception e) {
-            logger.error("during create refresh token {}", e.getMessage());
+            logger.error("during create refresh token error {}", e.getMessage());
             throw new Exception("during create refresh token error: "+ e.getMessage());
         }
     }

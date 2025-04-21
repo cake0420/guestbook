@@ -1,10 +1,7 @@
 package com.cake7.guestbook.mapper;
 
 import com.cake7.guestbook.domain.User;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.time.ZonedDateTime;
@@ -12,6 +9,15 @@ import java.time.ZonedDateTime;
 @Mapper
 @Repository
 public interface UserMapper {
+
+    @Select("""
+        SELECT id
+        FROM user
+        WHERE provider_id = #{providerId}
+    """)
+    String findByProviderId(@Param("providerId") String providerId);
+
+
     @Update("""
         UPDATE user
         SET updated_at = #{updatedAt}
