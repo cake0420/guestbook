@@ -13,8 +13,8 @@
         private final String providerId;
         private final String email;
         private final String name;
-        private final String profile_image_url;
         private final String role;
+        private final String profile_image_url;
         private final ZonedDateTime createdAt;
         private final ZonedDateTime updatedAt;
 

@@ -19,11 +19,24 @@ public class JwtUtils {
 
     public Claims parseToken(String token) {
         try {
-            return Jwts.parser()
+            Claims claims = Jwts.parser()
                     .verifyWith(jwtConfig.secretKey())
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
+
+            // ✅ 발급자 검증
+            if (claims.getIssuer() == null ||
+                    !claims.getIssuer().contains("cake7-auth-server")) {
+                throw new JwtException("Invalid issuer");
+            }
+
+            // ✅ 대상자 검증
+            if (claims.getAudience() == null ||
+                    !claims.getAudience().contains("cake7-client")) {
+                throw new JwtException("Invalid audience");
+            }
+            return claims;
         } catch (JwtException e) {
             logger.error("parse token error: {}", e.getMessage());
             throw new JwtException("parse token error");
@@ -36,10 +49,7 @@ public class JwtUtils {
         }
 
         try {
-            Jwts.parser()
-                    .verifyWith(jwtConfig.secretKey())
-                    .build()
-                    .parseSignedClaims(token);
+            parseToken(token);
             return true;
         } catch (Exception e) {
             logger.error("during validate token error: {}", e.getMessage());

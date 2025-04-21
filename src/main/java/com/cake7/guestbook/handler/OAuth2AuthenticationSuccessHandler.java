@@ -30,14 +30,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                                         Authentication authentication) throws IOException, ServletException {
         try {
 
-//            String token = jwtUtils.extractToken(request);
-//            if (token != null && !token.isEmpty() && jwtUtils.validateToken(token)) {
-//                logger.info("Valid token already exists, skipping token generation");
-//                String targetUrl = UriComponentsBuilder.fromUriString("/").build().toUriString();
-//                getRedirectStrategy().sendRedirect(request, response, targetUrl);
-//                return;
-//            }
-
             String token = jwtServiceImpl.generateAccessToken(authentication);
             String refreshToken = refreshTokenServiceImpl.createRefreshToken(authentication);
 

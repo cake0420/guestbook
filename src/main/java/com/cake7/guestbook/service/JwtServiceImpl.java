@@ -30,19 +30,22 @@ public class JwtServiceImpl implements JwtService {
         try {
             OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
             String providerId = oAuth2User.getAttribute("sub");
-//        String subject = oAuth2User.getAttribute("sub");
             String authorities = authentication.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.joining(","));
 
             ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
             ZonedDateTime expiration = now.plus(jwtConfig.getExpiration(), ChronoUnit.MILLIS);
+            System.out.println("OAuth2User attributes: " + oAuth2User.getAttributes());
+            System.out.println("Authorities: " + authentication.getAuthorities());
 
             return Jwts.builder()
                     .subject(providerId)
                     .claim("authorities",authorities)
                     .issuedAt(Date.from(now.toInstant()))
                     .expiration(Date.from(expiration.toInstant()))
+                    .issuer("cake7-auth-server") // ✅ 발급자 설정
+                    .audience().add("cake7-client").and()
                     .signWith(jwtConfig.secretKey())
                     .compact();
         } catch (Exception e) {

@@ -55,6 +55,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                         .provider(provider)
                         .providerId(providerId)
                         .email(email)
+                        .name(name)
                         .role("ROLE_USER")
                         .profile_image_url(profileImage)
                         .createdAt(utcNow)

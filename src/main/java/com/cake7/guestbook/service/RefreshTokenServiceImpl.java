@@ -74,7 +74,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
             // 토큰 사용처리
             refreshToken.markUsed();
-            refreshTokenMapper.updateUsedStatus(refreshToken.getUserId(), true);
+            refreshTokenMapper.updateUsedStatus(refreshToken.getId(), true);
 
             // 새 액세스 토큰 생성
             Authentication authentication = jwtServiceImpl.getAuthentication(refreshToken.getUserId());
