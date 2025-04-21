@@ -1,6 +1,6 @@
 package com.cake7.guestbook.handler;
 
-import com.cake7.guestbook.service.JwtService;
+import com.cake7.guestbook.service.JwtServiceImpl;
 import com.cake7.guestbook.service.RefreshTokenServiceImpl;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -19,7 +19,7 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
-    private final JwtService jwtService;
+    private final JwtServiceImpl jwtServiceImpl;
     private final RefreshTokenServiceImpl refreshTokenServiceImpl;
     private final static Logger logger = LogManager.getLogger(OAuth2AuthenticationSuccessHandler.class);
 
@@ -27,10 +27,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
         try {
-            String token = jwtService.generateAccessToken(authentication);
+            String token = jwtServiceImpl.generateAccessToken(authentication);
             String refreshToken = refreshTokenServiceImpl.createRefreshToken(authentication);
 
-            response.setHeader("Authorization", "Bearer " + token);
+//            response.setHeader("Authorization", "Bearer " + token);
 
             Cookie cookie = new Cookie("jwt_token", token);
             cookie.setHttpOnly(true);

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,14 +22,17 @@ import java.util.UUID;
 public class RefreshTokenServiceImpl implements RefreshTokenService {
     private static final Logger logger = LogManager.getLogger(RefreshTokenService.class);
     private final RefreshTokenMapper refreshTokenMapper;
-    private final JwtServiceImpl jwtService;
+    private final JwtServiceImpl jwtServiceImpl;
     private final UserMapper userMapper;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public String createRefreshToken(Authentication authentication) throws Exception {
         try {
-            String userId = userMapper.findByProviderId(authentication.getName());
+            OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+            String providerId = oAuth2User.getAttribute("sub");
+
+            String userId = userMapper.findByProviderId(providerId);
 
             String refreshTokenId = UUID.randomUUID().toString();
             ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
@@ -73,8 +77,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
             refreshTokenMapper.updateUsedStatus(refreshToken.getUserId(), true);
 
             // 새 액세스 토큰 생성
-            Authentication authentication = jwtService.getAuthentication(refreshToken.getUserId());
-            String newAccessToken = jwtService.generateAccessToken(authentication);
+            Authentication authentication = jwtServiceImpl.getAuthentication(refreshToken.getUserId());
+            String newAccessToken = jwtServiceImpl.generateAccessToken(authentication);
 
             String newRefreshToken = createRefreshToken(authentication);
 

@@ -1,7 +1,6 @@
 package com.cake7.guestbook.service;
 
 import com.cake7.guestbook.config.JwtConfig;
-import com.cake7.guestbook.mapper.RefreshTokenMapper;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -24,7 +23,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
     private final JwtConfig jwtConfig;
-    private final RefreshTokenMapper refreshTokenMapper;
     private static final Logger logger = LogManager.getLogger();
 
     @Override

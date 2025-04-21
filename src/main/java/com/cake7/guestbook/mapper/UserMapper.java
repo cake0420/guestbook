@@ -23,9 +23,9 @@ public interface UserMapper {
         SET updated_at = #{updatedAt}
         WHERE provider = #{provider} AND provider_id = #{providerId}
 """)
-    int updateByUpdatedAt(@Param("provider") String providerId,
-                                     @Param("providerId") String providerName,
-                                     @Param("updatedAt") ZonedDateTime updatedAt);
+    int updateByUpdatedAt(@Param("provider") String provider,
+                          @Param("providerId") String providerId,
+                          @Param("updatedAt") ZonedDateTime updatedAt);
 
     @Insert("""
         INSERT INTO user (id, provider, provider_id, email, name, role, profile_image_url, created_at, updated_at)
