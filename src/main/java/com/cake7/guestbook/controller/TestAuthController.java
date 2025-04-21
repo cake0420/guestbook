@@ -5,7 +5,6 @@ import com.cake7.guestbook.util.JwtUtils;
 import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +24,7 @@ public class TestAuthController {
     @GetMapping("/validate")
     public ResponseEntity<TestTokenDTO> validateToken(HttpServletRequest request) {
         // Extract token specifically from cookies
-        String token = extractTokenFromCookie(request);
+        String token = jwtUtils.extractToken(request);
 
         if (token != null && !token.isEmpty()) {
             boolean isValid = jwtUtils.validateToken(token);
@@ -35,24 +34,11 @@ public class TestAuthController {
                 String email = claims.getSubject();
                 String authorities = (String) claims.get("authorities");
 
-                return ResponseEntity.ok(new TestTokenDTO(true,
+                return ResponseEntity.ok(new TestTokenDTO(claims, isValid,
                         "Valid token for user: " + email + " with authorities: " + authorities));
             }
         }
 
-        return ResponseEntity.badRequest().body(new TestTokenDTO(false, "Invalid or missing token"));
+        return ResponseEntity.badRequest().body(new TestTokenDTO(null, false, "Invalid or missing token"));
     }
-
-    private String extractTokenFromCookie(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("jwt_token")) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
-    }
-
 }

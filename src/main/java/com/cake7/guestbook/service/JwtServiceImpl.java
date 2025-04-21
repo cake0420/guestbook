@@ -29,7 +29,7 @@ public class JwtServiceImpl implements JwtService {
     public String generateAccessToken(Authentication authentication) throws Exception {
         try {
             OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-            String email = oAuth2User.getAttribute("email");
+            String providerId = oAuth2User.getAttribute("sub");
 //        String subject = oAuth2User.getAttribute("sub");
             String authorities = authentication.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
@@ -39,9 +39,7 @@ public class JwtServiceImpl implements JwtService {
             ZonedDateTime expiration = now.plus(jwtConfig.getExpiration(), ChronoUnit.MILLIS);
 
             return Jwts.builder()
-                    .subject(email)
-                    .claim("email",email)
-//                .claim("sub",subject)
+                    .subject(providerId)
                     .claim("authorities",authorities)
                     .issuedAt(Date.from(now.toInstant()))
                     .expiration(Date.from(expiration.toInstant()))
