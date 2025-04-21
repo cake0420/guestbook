@@ -2,6 +2,7 @@ package com.cake7.guestbook.handler;
 
 import com.cake7.guestbook.service.JwtServiceImpl;
 import com.cake7.guestbook.service.RefreshTokenServiceImpl;
+import com.cake7.guestbook.util.JwtUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,6 +21,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final JwtServiceImpl jwtServiceImpl;
+    private final JwtUtils jwtUtils;
     private final RefreshTokenServiceImpl refreshTokenServiceImpl;
     private final static Logger logger = LogManager.getLogger(OAuth2AuthenticationSuccessHandler.class);
 
@@ -27,6 +29,15 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
         try {
+
+//            String token = jwtUtils.extractToken(request);
+//            if (token != null && !token.isEmpty() && jwtUtils.validateToken(token)) {
+//                logger.info("Valid token already exists, skipping token generation");
+//                String targetUrl = UriComponentsBuilder.fromUriString("/").build().toUriString();
+//                getRedirectStrategy().sendRedirect(request, response, targetUrl);
+//                return;
+//            }
+
             String token = jwtServiceImpl.generateAccessToken(authentication);
             String refreshToken = refreshTokenServiceImpl.createRefreshToken(authentication);
 
@@ -38,8 +49,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             cookie.setMaxAge(3600);
             response.addCookie(cookie);
 
-            String targetUrl = UriComponentsBuilder.fromUriString("/").build().toUriString();
+            clearAuthenticationAttributes(request); // 이게 중요합니다!
 
+            String targetUrl = UriComponentsBuilder.fromUriString("/").build().toUriString();
             getRedirectStrategy().sendRedirect(request, response, targetUrl);
 
         } catch (ServletException e) {

@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 @Component
 @RequiredArgsConstructor
@@ -32,9 +31,15 @@ public class JwtUtils {
     }
 
     public boolean validateToken(String token) {
+        if (token == null || token.isEmpty()) {
+            return false;
+        }
+
         try {
             Jwts.parser()
-                    .verifyWith(jwtConfig.secretKey());
+                    .verifyWith(jwtConfig.secretKey())
+                    .build()
+                    .parseSignedClaims(token);
             return true;
         } catch (Exception e) {
             logger.error("during validate token error: {}", e.getMessage());
@@ -43,10 +48,10 @@ public class JwtUtils {
     }
 
     public String extractToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
+//        String bearerToken = request.getHeader("Authorization");
+//        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+//            return bearerToken.substring(7);
+//        }
 
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
@@ -58,5 +63,4 @@ public class JwtUtils {
         }
         return null;
     }
-
 }
