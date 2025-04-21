@@ -25,7 +25,7 @@ public class JwtServiceImpl implements JwtService {
     private static final Logger logger = LogManager.getLogger();
 
     @Override
-    public String generateToken(Authentication authentication) {
+    public String generateAccessToken(Authentication authentication) {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
         String email = oAuth2User.getAttribute("email");
@@ -36,6 +36,31 @@ public class JwtServiceImpl implements JwtService {
 
         ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
         ZonedDateTime expiration = now.plus(jwtConfig.getExpiration(), ChronoUnit.MILLIS);
+
+
+        return Jwts.builder()
+                .subject(email)
+                .claim("email",email)
+//                .claim("sub",subject)
+                .claim("authorities",authorities)
+                .issuedAt(Date.from(now.toInstant()))
+                .expiration(Date.from(expiration.toInstant()))
+                .signWith(jwtConfig.secretKey())
+                .compact();
+    }
+
+    @Override
+    public String generateRefreshToken(Authentication authentication) {
+        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+
+        String email = oAuth2User.getAttribute("email");
+//        String subject = oAuth2User.getAttribute("sub");
+        String authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        ZonedDateTime expiration = now.plus(60 * 60 * 24, ChronoUnit.MILLIS);
 
 
         return Jwts.builder()

@@ -4,7 +4,8 @@ import io.jsonwebtoken.Claims;
 import org.springframework.security.core.Authentication;
 
 public interface JwtService {
-    String generateToken(Authentication authentication);
+    String generateAccessToken(Authentication authentication);
+    String generateRefreshToken(Authentication authentication);
     Claims parseToken(String token);
     boolean validateToken(String token);
 }
