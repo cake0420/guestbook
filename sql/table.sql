@@ -16,7 +16,9 @@ CREATE TABLE refresh_token (
     user_id VARCHAR(36) NOT NULL ,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     expired_at DATETIME  NOT NULL,
+    used BOOLEAN NOT NULL DEFAULT FALSE,
 
+    INDEX idx_user_id (user_id),
     INDEX idx_expired_at (expired_at),
     CONSTRAINT fk_token_user_id FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );

@@ -1,7 +1,7 @@
 package com.cake7.guestbook.controller;
 
 import com.cake7.guestbook.dto.TestTokenDTO;
-import com.cake7.guestbook.service.JwtServiceImpl;
+import com.cake7.guestbook.util.JwtUtils;
 import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 
 public class TestAuthController {
-    private final JwtServiceImpl jwtService;
+    private final JwtUtils jwtUtils;
 
     @Operation(summary = "토큰 검증", description = "JWT 토큰의 유효성을 검증합니다.")
     @GetMapping("/validate")
@@ -28,10 +28,10 @@ public class TestAuthController {
         String token = extractTokenFromCookie(request);
 
         if (token != null && !token.isEmpty()) {
-            boolean isValid = jwtService.validateToken(token);
+            boolean isValid = jwtUtils.validateToken(token);
             if (isValid) {
                 // If valid, we can also extract and return some user information
-                Claims claims = jwtService.parseToken(token);
+                Claims claims = jwtUtils.parseToken(token);
                 String email = claims.getSubject();
                 String authorities = (String) claims.get("authorities");
 

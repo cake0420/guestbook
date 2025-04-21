@@ -1,6 +1,6 @@
 package com.cake7.guestbook.filter;
 
-import com.cake7.guestbook.service.JwtService;
+import com.cake7.guestbook.util.JwtUtils;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
+    private final JwtUtils jwtUtils;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -32,8 +32,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = extractToken(request);
 
-        if (StringUtils.hasText(token) && jwtService.validateToken(token)) {
-            Claims claims = jwtService.parseToken(token);
+        if (StringUtils.hasText(token) && jwtUtils.validateToken(token)) {
+            Claims claims = jwtUtils.parseToken(token);
             String email = claims.getSubject();
             String authorities = (String) claims.get("authorities");
 

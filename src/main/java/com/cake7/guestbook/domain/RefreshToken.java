@@ -1,15 +1,28 @@
 package com.cake7.guestbook.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.time.ZonedDateTime;
 
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class RefreshToken {
-    private final String id;
-    private final String userId;
-    private final ZonedDateTime createdAt;
-    private final ZonedDateTime expiresAt;
+    private String id;
+    private String userId;
+    private ZonedDateTime createdAt;
+    private ZonedDateTime expiresAt;
+    private boolean used;
+
+    public boolean isExpired() {
+        return expiresAt.isBefore(ZonedDateTime.now());
+    }
+
+    public void markUsed() {
+        this.used = true;
+    }
 }
