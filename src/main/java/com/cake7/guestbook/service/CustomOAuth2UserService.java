@@ -50,17 +50,17 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         // 기존 사용자 조회
         ZonedDateTime utcNow = ZonedDateTime.now(ZoneOffset.UTC);
 
-        User newUser = new User(
-                            UUID.randomUUID().toString(),
-                            provider,
-                            providerId,
-                            email,
-                            name,
-                            "ROLE_USER",
-                            profileImage,
-                            utcNow,
-                            utcNow
-                    );
+        User newUser = User.builder()
+                        .id(UUID.randomUUID().toString())
+                        .provider(provider)
+                        .providerId(providerId)
+                        .email(email)
+                        .role("ROLE_USER")
+                        .profile_image_url(profileImage)
+                        .createdAt(utcNow)
+                        .updatedAt(utcNow)
+                        .build();
+
         try {
             userServiceImpl.updateOrSaveUser(newUser);
         } catch (Exception e) {
