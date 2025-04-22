@@ -8,12 +8,16 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Duration;
 
 @Tag(name = "Authentication", description = "인증 관련 API")
 @RestController
@@ -36,7 +40,14 @@ public class AuthController {
                     Claims claims = jwtUtils.parseToken(token);
                     String id = (String) claims.get("sub");
                     RefreshTokenResponseDTO response = refreshTokenServiceImpl.regenerateAccessAndRefreshToken(id);
-                    return ResponseEntity.ok(response);
+                    ResponseCookie cookie = ResponseCookie.from("jwt_token", response.accessToken())
+                            .httpOnly(true)
+                            .secure(true)
+                            .path("/")
+                            .maxAge(Duration.ofHours(1))
+                            .sameSite("Strict")  // 이게 핵심!
+                            .build();
+                    return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(response);
                 }
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

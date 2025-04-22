@@ -4,12 +4,12 @@ import com.cake7.guestbook.service.JwtServiceImpl;
 import com.cake7.guestbook.service.RefreshTokenServiceImpl;
 import com.cake7.guestbook.util.JwtUtils;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -35,13 +35,18 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
 //            response.setHeader("Authorization", "Bearer " + token);
 
-            Cookie cookie = new Cookie("jwt_token", token);
-            cookie.setHttpOnly(true);
-            cookie.setPath("/");
-            cookie.setMaxAge(3600);
-            response.addCookie(cookie);
 
-            clearAuthenticationAttributes(request); // 이게 중요합니다!
+            ResponseCookie cookie = ResponseCookie.from("jwt_token", token)
+                                            .sameSite("strict")
+                                            .httpOnly(true)
+                                            .secure(true)
+                                            .path("/")
+                                            .maxAge(60 * 60)
+                                            .build();
+
+            response.addHeader("Set-Cookie", cookie.toString());
+
+//            clearAuthenticationAttributes(request); // 이게 중요합니다!
 
             String targetUrl = UriComponentsBuilder.fromUriString("/").build().toUriString();
             getRedirectStrategy().sendRedirect(request, response, targetUrl);

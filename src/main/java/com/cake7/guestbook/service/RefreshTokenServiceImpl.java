@@ -90,7 +90,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
             logger.debug("Refreshed tokens for user: {}", refreshToken.getUserId());
             return new RefreshTokenResponseDTO(newAccessToken, newRefreshToken,
-                    "Bearer", 60 * 60);
+                    "Cookie", 60 * 60 * 24 * 7);
 
         } catch (TokenException e) {
             logger.error("during regenerate refresh token {}", e.getMessage());

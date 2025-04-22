@@ -40,8 +40,7 @@ public class JwtServiceImpl implements JwtService {
 
             ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
             ZonedDateTime expiration = now.plus(jwtConfig.getExpiration(), ChronoUnit.MILLIS);
-            System.out.println("OAuth2User attributes: " + oAuth2User.getAttributes());
-            System.out.println("Authorities: " + authentication.getAuthorities());
+
             return Jwts.builder()
                     .subject(providerId)
                     .claim("authorities",authorities)
