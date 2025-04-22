@@ -9,6 +9,12 @@ import java.time.ZonedDateTime;
 @Mapper
 @Repository
 public interface UserMapper {
+    @Select("""
+        SELECT *
+        FROM user
+        WHERE id = #{id}
+    """)
+    User findById(@Param("id") String id);
 
     @Select("""
         SELECT id

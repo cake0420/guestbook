@@ -29,15 +29,12 @@ public class AuthController {
     public ResponseEntity<RefreshTokenResponseDTO> refresh(@AuthenticationPrincipal HttpServletRequest request) {
         try {
             String token = jwtUtils.extractToken(request);
-            System.out.println(token);
             if (token != null && !token.isEmpty()) {
                 boolean isValid = jwtUtils.validateToken(token);
-
                 if (isValid) {
                     // If valid, we can also extract and return some user information
                     Claims claims = jwtUtils.parseToken(token);
                     String id = (String) claims.get("sub");
-                    System.out.println(id);
                     RefreshTokenResponseDTO response = refreshTokenServiceImpl.regenerateAccessAndRefreshToken(id);
                     return ResponseEntity.ok(response);
                 }

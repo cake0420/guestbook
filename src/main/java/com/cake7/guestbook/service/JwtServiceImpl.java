@@ -1,6 +1,9 @@
 package com.cake7.guestbook.service;
 
 import com.cake7.guestbook.config.JwtConfig;
+import com.cake7.guestbook.domain.User;
+import com.cake7.guestbook.exception.TokenException;
+import com.cake7.guestbook.mapper.UserMapper;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -9,20 +12,21 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
     private final JwtConfig jwtConfig;
+    private final UserMapper userMapper;
     private static final Logger logger = LogManager.getLogger();
 
     @Override
@@ -56,10 +60,39 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public Authentication getAuthentication(String subject) {
-        // 리프레시 토큰에서 사용자 인증 객체 생성 (userId = subject)
-        // 실제 구현에서는 UserService를 통해 DB에서 사용자 정보와 권한을 조회할 수 있음
-        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
-        return new UsernamePasswordAuthenticationToken(subject, null, authorities);
+    public Authentication getAuthentication(String userId) {
+        try {
+            // Fetch user details from the database using the user ID
+            User user = userMapper.findById(userId);
+
+            if (user == null) {
+                throw new TokenException("User not found for ID: " + userId);
+            }
+
+            // Create authorities based on the user's role
+            List<SimpleGrantedAuthority> authorities =
+                    Collections.singletonList(new SimpleGrantedAuthority(user.getRole()));
+
+            // Create OAuth2User-like attributes for consistency with your existing authentication
+            Map<String, Object> attributes = new HashMap<>();
+            attributes.put("sub", user.getProviderId());
+            attributes.put("name", user.getName());
+            attributes.put("email", user.getEmail());
+            attributes.put("picture", user.getProfile_image_url());
+
+            // Create OAuth2User
+            OAuth2User oAuth2User = new DefaultOAuth2User(
+                    authorities,
+                    attributes,
+                    "sub"
+            );
+
+            // Return authentication with OAuth2User as principal
+            return new UsernamePasswordAuthenticationToken(oAuth2User, null, authorities);
+
+        } catch (Exception e) {
+            logger.error("Error getting authentication: {}", e.getMessage());
+            throw new TokenException("Error getting authentication: " + e.getMessage());
+        }
     }
 }

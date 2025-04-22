@@ -57,8 +57,14 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Transactional
     public RefreshTokenResponseDTO regenerateAccessAndRefreshToken(String refreshTokenId) throws Exception {
         try {
-            RefreshToken refreshToken = refreshTokenMapper.findById(refreshTokenId)
+            RefreshToken refreshToken = refreshTokenMapper.findByProviderId(refreshTokenId)
                     .orElseThrow(() -> new TokenException("refresh token not found"));
+
+            if (refreshToken.getExpiredAt() == null) {
+                logger.warn("ExpiredAt is null for token: {}", refreshTokenId);
+                refreshTokenMapper.invalidateAllUserTokens(refreshToken.getUserId());
+                throw new TokenException("Invalid token state: expiration date is missing");
+            }
 
             // 토큰이 이미 사용됐다면 토큰 탈취 가능성 (RTR 핵심 기능)
             if(refreshToken.isUsed()) {
