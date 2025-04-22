@@ -1,6 +1,7 @@
 package com.cake7.guestbook.util;
 
 import com.cake7.guestbook.config.JwtConfig;
+import com.cake7.guestbook.exception.TokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -37,7 +38,7 @@ public class JwtUtils {
                 throw new JwtException("Invalid audience");
             }
             return claims;
-        } catch (JwtException e) {
+        } catch (TokenException e) {
             logger.error("parse token error: {}", e.getMessage());
             throw new JwtException("parse token error");
         }
@@ -51,7 +52,7 @@ public class JwtUtils {
         try {
             parseToken(token);
             return true;
-        } catch (Exception e) {
+        } catch (TokenException e) {
             logger.error("during validate token error: {}", e.getMessage());
             return false;
         }

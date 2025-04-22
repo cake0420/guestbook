@@ -48,7 +48,7 @@ public class JwtServiceImpl implements JwtService {
                     .expiration(Date.from(expiration.toInstant()))
                     .issuer("cake7-auth-server") // ✅ 발급자 설정
                     .audience().add("cake7-client").and()
-                    .signWith(jwtConfig.secretKey())
+                    .signWith(jwtConfig.secretKey(), Jwts.SIG.HS256)
                     .compact();
         } catch (Exception e) {
             logger.error("during generate access token {}", e.getMessage());
