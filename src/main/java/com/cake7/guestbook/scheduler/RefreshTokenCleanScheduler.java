@@ -7,6 +7,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.ZonedDateTime;
+
 @Component
 @RequiredArgsConstructor
 public class RefreshTokenCleanScheduler {
@@ -16,7 +18,8 @@ public class RefreshTokenCleanScheduler {
     @Scheduled(cron = "0 0 0 * * *")
     public void cleanUsedRefreshToken() throws Exception {
         try {
-            refreshTokenMapper.deleteAllUserTokens();
+            ZonedDateTime now = ZonedDateTime.now();
+            refreshTokenMapper.deleteAllUserTokens(now);
             logger.info("clean used refresh token");
         } catch (Exception e) {
             logger.error("clean used refresh token Exception error {}", e.getMessage());

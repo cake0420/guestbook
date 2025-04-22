@@ -4,6 +4,7 @@ import com.cake7.guestbook.domain.RefreshToken;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 @Mapper
@@ -39,7 +40,8 @@ public interface RefreshTokenMapper {
     void updateUsedStatus(@Param("id") String id, @Param("used") boolean used);
 
     @Delete("""
-        DELETE FROM refresh_token WHERE used = true
-    """)
-    void deleteAllUserTokens();
+                DELETE FROM refresh_token \s
+                WHERE used = true OR expired_at < #{expiredAt}
+           \s""")
+    void deleteAllUserTokens(ZonedDateTime expiredAt);
 }
