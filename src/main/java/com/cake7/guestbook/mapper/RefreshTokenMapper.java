@@ -20,8 +20,7 @@ public interface RefreshTokenMapper {
         SELECT *
         FROM refresh_token re
         INNER JOIN user u ON u.id = re.user_id
-        WHERE provider_id = #{providerId}
-        LIMIT 1
+        WHERE provider_id = #{providerId} AND used = false
     """)
     Optional<RefreshToken> findByProviderId(String providerId);
 
