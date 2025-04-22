@@ -39,4 +39,8 @@ public interface RefreshTokenMapper {
     """)
     void updateUsedStatus(@Param("id") String id, @Param("used") boolean used);
 
+    @Delete("""
+        DELETE FROM refresh_token WHERE used = true
+    """)
+    void deleteAllUserTokens();
 }

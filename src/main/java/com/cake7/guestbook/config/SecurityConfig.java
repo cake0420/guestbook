@@ -1,6 +1,7 @@
 package com.cake7.guestbook.config;
 
 import com.cake7.guestbook.filter.JwtAuthenticationFilter;
+import com.cake7.guestbook.handler.CustomLogoutSuccessHandler;
 import com.cake7.guestbook.handler.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -41,7 +42,7 @@ public class SecurityConfig {
 
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomLogoutSuccessHandler customLogoutSuccessHandler) throws Exception {
         http.
                     cors(Customizer.withDefaults()) // ✅ CORS 활성화
                     .csrf(AbstractHttpConfigurer::disable)
@@ -71,7 +72,7 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/")
+                        .logoutSuccessHandler(customLogoutSuccessHandler)
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID", "jwt_token")
                         .permitAll()
