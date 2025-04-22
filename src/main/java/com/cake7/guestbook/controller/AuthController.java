@@ -12,7 +12,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +29,7 @@ public class AuthController {
 
     @Operation(summary = "토큰 갱신", description = "리프레시 토큰을 사용하여 액세스 토큰과 리프레시 토큰을 갱신합니다.")
     @GetMapping("/refresh")
-    public ResponseEntity<RefreshTokenResponseDTO> refresh(@AuthenticationPrincipal HttpServletRequest request) {
+    public ResponseEntity<RefreshTokenResponseDTO> refresh(HttpServletRequest request) {
         try {
             String token = jwtUtils.extractToken(request);
             if (token != null && !token.isEmpty()) {
