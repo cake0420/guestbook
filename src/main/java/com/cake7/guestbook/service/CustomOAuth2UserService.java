@@ -1,6 +1,7 @@
 package com.cake7.guestbook.service;
 
 import com.cake7.guestbook.domain.User;
+import com.cake7.guestbook.domain.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -56,7 +57,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                         .providerId(providerId)
                         .email(email)
                         .name(name)
-                        .role("ROLE_USER")
+                        .role(Role.USER.getValue())
                         .profile_image_url(profileImage)
                         .createdAt(utcNow)
                         .updatedAt(utcNow)

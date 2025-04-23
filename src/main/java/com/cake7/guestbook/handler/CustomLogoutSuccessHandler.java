@@ -3,7 +3,6 @@ package com.cake7.guestbook.handler;
 import com.cake7.guestbook.mapper.RefreshTokenMapper;
 import com.cake7.guestbook.mapper.UserMapper;
 import com.cake7.guestbook.util.JwtUtils;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,7 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
 
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response,
-                                Authentication authentication) throws IOException, ServletException, IOException {
+                                Authentication authentication) throws IOException {
         try {
             String token = jwtUtils.extractToken(request);
             if (token != null && !token.isEmpty()) {

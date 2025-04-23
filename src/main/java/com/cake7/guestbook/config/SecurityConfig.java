@@ -107,9 +107,11 @@ public class SecurityConfig {
 
     @Bean
     public RoleHierarchy roleHierarchy() {
-        return RoleHierarchyImpl.fromHierarchy("ROLE_ADMIN > ROLE_DB\n" +
-                "ROLE_DB > ROLE_USER\n" +
-                "ROLE_USER > ROLE_ANONYMOUS");
+        return RoleHierarchyImpl.fromHierarchy("""
+                    ROLE_ADMIN > ROLE_DB\s
+                    ROLE_DB > ROLE_USER
+                    ROLE_USER > ROLE_ANONYMOUS
+               \s""");
     }
 
 

@@ -18,14 +18,25 @@ public class SwaggerConfig {
                         .title("my title")
                         .description("my description")
                         .version("1.0.0");
-        String jwtSchemaName = "JWT TOKEN";
-        SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwtSchemaName);
+//        String jwtSchemaName = "JWT TOKEN";
+//        SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwtSchemaName);
+//        Components components = new Components()
+//                .addSecuritySchemes(jwtSchemaName, new SecurityScheme()
+//                        .name(jwtSchemaName)
+//                        .type(SecurityScheme.Type.HTTP)
+//                        .scheme("bearer")
+//                        .bearerFormat("JWT"));
+
+        String jwtCookieName = "jwt_token";
+
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwtCookieName);
         Components components = new Components()
-                .addSecuritySchemes(jwtSchemaName, new SecurityScheme()
-                        .name(jwtSchemaName)
-                        .type(SecurityScheme.Type.HTTP)
-                        .scheme("bearer")
-                        .bearerFormat("JWT"));
+                .addSecuritySchemes(jwtCookieName,
+                        new SecurityScheme()
+                                .name(jwtCookieName)
+                                .type(SecurityScheme.Type.APIKEY)
+                                .in(SecurityScheme.In.COOKIE)  // ← 핵심!
+                );
 
         return new OpenAPI()
                 .addServersItem(new Server().url("/"))

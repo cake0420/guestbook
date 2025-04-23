@@ -2,6 +2,7 @@ package com.cake7.guestbook.filter;
 
 import com.cake7.guestbook.util.JwtUtils;
 import io.jsonwebtoken.Claims;
+import io.micrometer.common.lang.NonNullApi;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
+@NonNullApi
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
@@ -33,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (StringUtils.hasText(token) && jwtUtils.validateToken(token)) {
             Claims claims = jwtUtils.parseToken(token);
-            String email = claims.getSubject();
+            String providerId = claims.getSubject();
             String authorities = (String) claims.get("authorities");
 
             List<SimpleGrantedAuthority> grantedAuthorities = Arrays.stream(authorities.split(","))
@@ -41,7 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .collect(Collectors.toList());
 
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(email, null, grantedAuthorities);
+                    new UsernamePasswordAuthenticationToken(providerId, token, grantedAuthorities);
 
             //이 인증 객체를 시큐리티 컨텍스트에 등록하면, 이후 컨트롤러 등에서 @AuthenticationPrincipal을 통해 유저 정보를 가져올 수 있음.
             SecurityContextHolder.getContext().setAuthentication(authentication);

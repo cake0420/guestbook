@@ -1,6 +1,5 @@
 package com.cake7.guestbook.config;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +15,7 @@ import java.io.IOException;
 public class OAuth2AuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
-                         AuthenticationException authException) throws IOException, ServletException {
+                         AuthenticationException authException) throws IOException {
 
         // 이미 인증된 사용자인지 확인
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
