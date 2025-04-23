@@ -54,6 +54,7 @@ public class SecurityConfig {
                     .requestMatchers("/", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                      .requestMatchers("/oauth2/authorization/naver/**").permitAll()
                     .requestMatchers("/login/oauth2/code/google/**").permitAll()
+                    .requestMatchers("/login/oauth2/code/naver/**").permitAll()
                     .requestMatchers("/oauth2/authorization/google/**").permitAll()
                     .requestMatchers("/v1/user/**").hasRole("USER")
                     .requestMatchers("/v1/admin/**").hasRole("ADMIN")

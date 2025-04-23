@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -32,8 +33,9 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public String generateAccessToken(Authentication authentication) throws Exception {
         try {
-            OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-            String providerId = oAuth2User.getAttribute("sub");
+
+            String registrationId = ((OAuth2AuthenticationToken) authentication).getAuthorizedClientRegistrationId();
+            String providerId = getProviderId(authentication,registrationId);
             String authorities = authentication.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.joining(","));
@@ -68,6 +70,11 @@ public class JwtServiceImpl implements JwtService {
                 throw new TokenException("User not found for ID: " + userId);
             }
 
+//            String registrationId = user.getProvider();
+//            String userNameAttribute = user.getUserNameAttribute();
+
+//            Oauth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(registrationId, userNameAttribute);
+
             // Create authorities based on the user's role
             List<SimpleGrantedAuthority> authorities =
                     Collections.singletonList(new SimpleGrantedAuthority(user.getRole()));
@@ -94,4 +101,27 @@ public class JwtServiceImpl implements JwtService {
             throw new TokenException("Error getting authentication: " + e.getMessage());
         }
     }
+
+    private String getProviderId(Authentication authentication,String registrationId) {
+        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+        switch (registrationId.toLowerCase()) {
+            case "google" -> {
+                logger.debug("Google Login");
+                return oAuth2User.getAttribute("sub");
+            }
+            case "naver" -> {
+                logger.debug("Naver Login");
+                return oAuth2User.getAttribute("response");
+            }
+            case "kakao" -> {
+                logger.debug("Kakao Login");
+                return null;
+            }
+            default -> {
+                logger.error("Invalid registrationId: {}", registrationId);
+                throw new TokenException("Invalid registrationId: " + registrationId);
+            }
+        }
+    }
+
 }

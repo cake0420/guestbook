@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -40,7 +39,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 .getProviderDetails()
                 .getUserInfoEndpoint()
                 .getUserNameAttributeName();
-
         Oauth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(registrationId, oAuth2User.getAttributes());
 
         String providerId = userInfo.getId();
@@ -48,8 +46,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String name = userInfo.getName();
         String profileImage = userInfo.getImageUrl();
 
-        if (Objects.requireNonNull(providerId).isEmpty() || Objects.requireNonNull(email).isEmpty()) {
-            logger.error("provider or email is empty");
+
+        if (Objects.requireNonNull(registrationId).isEmpty() || Objects.requireNonNull(providerId).isEmpty()) {
+            logger.error("providerId or registrationId is empty");
             throw new OAuth2AuthenticationException(new OAuth2Error("Missing essential user info from OAuth provider"));
         }
 
@@ -66,16 +65,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 .updatedAt(utcNow)
                 .build();
 
-        Map<String, Object> customAttributes;
 
-        // 🔄 플랫폼 분기 처리
-        switch (registrationId.toLowerCase()) {
-            case "naver" -> customAttributes = (Map<String, Object>) oAuth2User.getAttributes().get("response");
-            case "google", "kakao" -> customAttributes = oAuth2User.getAttributes();
-            default -> throw new OAuth2AuthenticationException(
-                    new OAuth2Error("unsupported_platform: " + registrationId)
-            );
-        }
+
 
         try {
             userServiceImpl.updateOrSaveUser(newUser);
@@ -85,7 +76,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority(newUser.getRole())),
-                customAttributes,
+                oAuth2User.getAttributes(),
                 userNameAttribute
         );
     }
