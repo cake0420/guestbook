@@ -3,6 +3,7 @@ package com.cake7.guestbook.service;
 import com.cake7.guestbook.config.JwtConfig;
 import com.cake7.guestbook.domain.User;
 import com.cake7.guestbook.exception.TokenException;
+import com.cake7.guestbook.exception.UserNotfoundException;
 import com.cake7.guestbook.mapper.UserMapper;
 import com.cake7.guestbook.oauth.jwt.OAuth2ProviderStrategy;
 import com.cake7.guestbook.oauth.jwt.OAuth2ProviderStrategyFactory;
@@ -68,13 +69,13 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public Authentication getAuthentication(String userId) {
+    public Authentication getAuthentication(String userId) throws UserNotfoundException{
         try {
             // Fetch user details from the database using the user ID
             User user = userMapper.findById(userId);
 
             if (user == null) {
-                throw new TokenException("User not found for ID: " + userId);
+                throw new UserNotfoundException("User not found for ID: " + userId);
             }
 
             // Create authorities based on the user's role

@@ -76,7 +76,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
             if(!refreshToken.getExpiredAt().isBefore(now)) {
                 logger.warn("not ExpiredAt is before now for token: {}", refreshTokenId);
                 refreshTokenMapper.invalidateAllUserTokens(refreshToken.getUserId());
-                throw new TokenException("Invalid token state: not yet expired date");
+                throw new TokenException("Invalid token state: not yet expired token");
             }
 
             // 토큰이 이미 사용됐다면 토큰 탈취 가능성 (RTR 핵심 기능)
@@ -106,10 +106,10 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                     "Cookie", 60 * 60 * 24 * 7);
 
         } catch (TokenException e) {
-            logger.error("during regenerate refresh token {}", e.getMessage());
+            logger.error("during regenerate refresh token TokenException error {}", e.getMessage());
             throw new TokenException("during regenerate refresh token error: "+ e.getMessage());
         } catch (Exception e) {
-            logger.error("during create refresh token error {}", e.getMessage());
+            logger.error("during regenerate refresh token Exception error {}", e.getMessage());
             throw new Exception("during create refresh token error: "+ e.getMessage());
         }
     }

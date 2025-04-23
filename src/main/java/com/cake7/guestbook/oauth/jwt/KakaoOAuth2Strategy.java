@@ -10,7 +10,7 @@ import java.util.Map;
 public class KakaoOAuth2Strategy implements OAuth2ProviderStrategy {
     @Override
     public String extractProviderId(OAuth2User oAuth2User) {
-        return String.valueOf(oAuth2User.getAttribute("id"));
+        return oAuth2User.getAttribute("id");
     }
 
     @Override
