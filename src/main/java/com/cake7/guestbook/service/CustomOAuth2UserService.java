@@ -2,6 +2,8 @@ package com.cake7.guestbook.service;
 
 import com.cake7.guestbook.domain.User;
 import com.cake7.guestbook.domain.enums.Role;
+import com.cake7.guestbook.oauth.OAuth2UserInfoFactory;
+import com.cake7.guestbook.oauth.Oauth2UserInfo;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,12 +20,13 @@ import org.springframework.stereotype.Service;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User>  {
+public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     private static final Logger logger = LogManager.getLogger(CustomOAuth2UserService.class.getName());
     private final UserServiceImpl userServiceImpl;
 
@@ -32,47 +35,57 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = delegate.loadUser(userRequest);
 
-        String provider = userRequest.getClientRegistration().getRegistrationId(); // "google"
-        String providerId = oAuth2User.getAttribute("sub");
-        String email = oAuth2User.getAttribute("email");
-        String name = oAuth2User.getAttribute("name");
-        String profileImage = oAuth2User.getAttribute("picture");
-
+        String registrationId = userRequest.getClientRegistration().getRegistrationId();
         String userNameAttribute = userRequest.getClientRegistration()
                 .getProviderDetails()
                 .getUserInfoEndpoint()
                 .getUserNameAttributeName();
 
-        if (Objects.requireNonNull(providerId).isEmpty() ||
-                Objects.requireNonNull(email).isEmpty()) {
+        Oauth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(registrationId, oAuth2User.getAttributes());
+
+        String providerId = userInfo.getId();
+        String email = userInfo.getEmail();
+        String name = userInfo.getName();
+        String profileImage = userInfo.getImageUrl();
+
+        if (Objects.requireNonNull(providerId).isEmpty() || Objects.requireNonNull(email).isEmpty()) {
             logger.error("provider or email is empty");
             throw new OAuth2AuthenticationException(new OAuth2Error("Missing essential user info from OAuth provider"));
         }
-        // 기존 사용자 조회
-        ZonedDateTime utcNow = ZonedDateTime.now(ZoneOffset.UTC);
 
+        ZonedDateTime utcNow = ZonedDateTime.now(ZoneOffset.UTC);
         User newUser = User.builder()
-                        .id(UUID.randomUUID().toString())
-                        .provider(provider)
-                        .providerId(providerId)
-                        .email(email)
-                        .name(name)
-                        .role(Role.USER.getValue())
-                        .profile_image_url(profileImage)
-                        .createdAt(utcNow)
-                        .updatedAt(utcNow)
-                        .build();
+                .id(UUID.randomUUID().toString())
+                .provider(registrationId)
+                .providerId(providerId)
+                .email(email)
+                .name(name)
+                .role(Role.ROLE_USER.name())
+                .profile_image_url(profileImage)
+                .createdAt(utcNow)
+                .updatedAt(utcNow)
+                .build();
+
+        Map<String, Object> customAttributes;
+
+        // 🔄 플랫폼 분기 처리
+        switch (registrationId.toLowerCase()) {
+            case "naver" -> customAttributes = (Map<String, Object>) oAuth2User.getAttributes().get("response");
+            case "google", "kakao" -> customAttributes = oAuth2User.getAttributes();
+            default -> throw new OAuth2AuthenticationException(
+                    new OAuth2Error("unsupported_platform: " + registrationId)
+            );
+        }
 
         try {
             userServiceImpl.updateOrSaveUser(newUser);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("유저 저장 중 오류 발생", e);
         }
 
-        // Spring Security 세션에 저장할 사용자 객체 리턴
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority(newUser.getRole())),
-                oAuth2User.getAttributes(),
+                customAttributes,
                 userNameAttribute
         );
     }
