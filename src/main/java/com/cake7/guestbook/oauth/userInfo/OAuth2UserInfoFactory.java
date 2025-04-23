@@ -8,6 +8,7 @@ public class OAuth2UserInfoFactory {
         return switch (registrationId.toLowerCase()) {
             case "google" -> new GoogleOAuth2UserInfo(attributes);
             case "naver" -> new NaverOAuth2UserInfo(attributes);
+            case "kakao" -> new KakaoOAuth2UserInfo(attributes);
             default -> throw new IllegalArgumentException("Unsupported provider: " + registrationId);
         };
     }

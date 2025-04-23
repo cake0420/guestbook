@@ -72,6 +72,13 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 throw new TokenException("Invalid token state: expiration date is missing");
             }
 
+            ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+            if(!refreshToken.getExpiredAt().isBefore(now)) {
+                logger.warn("not ExpiredAt is before now for token: {}", refreshTokenId);
+                refreshTokenMapper.invalidateAllUserTokens(refreshToken.getUserId());
+                throw new TokenException("Invalid token state: not yet expired date");
+            }
+
             // 토큰이 이미 사용됐다면 토큰 탈취 가능성 (RTR 핵심 기능)
             if(refreshToken.isUsed()) {
                 logger.warn("Token reuse detected for user: {}", refreshToken.getUserId());
