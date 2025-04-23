@@ -70,11 +70,6 @@ public class JwtServiceImpl implements JwtService {
                 throw new TokenException("User not found for ID: " + userId);
             }
 
-//            String registrationId = user.getProvider();
-//            String userNameAttribute = user.getUserNameAttribute();
-
-//            Oauth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(registrationId, userNameAttribute);
-
             // Create authorities based on the user's role
             List<SimpleGrantedAuthority> authorities =
                     Collections.singletonList(new SimpleGrantedAuthority(user.getRole()));

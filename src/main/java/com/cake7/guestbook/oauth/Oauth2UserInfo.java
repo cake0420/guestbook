@@ -2,15 +2,12 @@ package com.cake7.guestbook.oauth;
 
 import java.util.Map;
 
-public abstract class Oauth2UserInfo {
+public interface Oauth2UserInfo {
 
-    protected Map<String, Object> attributes;
-    public Oauth2UserInfo(Map<String, Object> attributes) {
-        this.attributes = attributes;
-    }
+    String getId();
+    String getName();
+    String getEmail();
+    String getImageUrl();
 
-    public abstract String getId();
-    public abstract String getName();
-    public abstract String getEmail();
-    public abstract String getImageUrl();
+    Map<String, Object> getAttributes();
 }

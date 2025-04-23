@@ -2,10 +2,12 @@ package com.cake7.guestbook.oauth;
 
 import java.util.Map;
 
-public class NaverOAuth2UserInfo extends Oauth2UserInfo{
+public class NaverOAuth2UserInfo implements Oauth2UserInfo{
+
+    private final Map<String, Object> attributes;
 
     public NaverOAuth2UserInfo(Map<String, Object> attributes) {
-        super((Map<String, Object>) attributes.get("response"));
+        this.attributes = (Map<String, Object>) attributes.get("response");
     }
 
     @Override
@@ -26,5 +28,15 @@ public class NaverOAuth2UserInfo extends Oauth2UserInfo{
     @Override
     public String getImageUrl() {
         return (String) attributes.get("profile_image");
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return Map.of(
+                "id", getId(),
+                "name", getName(),
+                "email", getEmail(),
+                "profile_image", getImageUrl()
+        );
     }
 }
