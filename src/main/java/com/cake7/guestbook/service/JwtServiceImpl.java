@@ -69,7 +69,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public Authentication getAuthentication(String userId) throws UserNotfoundException{
+    public Authentication getAuthentication(String userId) throws UserNotfoundException, TokenException {
         try {
             // Fetch user details from the database using the user ID
             User user = userMapper.findById(userId);

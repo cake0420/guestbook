@@ -31,9 +31,6 @@
 <!-- 로그인한 사용자에게만 표시 -->
 <div sec:authorize="isAuthenticated()">
   <span sec:authentication="principal"></span>
-<!--  <span sec:authentication="principal.attributes['email']"></span>-->
-
-
   <form th:action="@{/logout}" method="post">
     <button type="submit">로그아웃</button>
   </form>

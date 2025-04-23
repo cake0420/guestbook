@@ -1,6 +1,7 @@
 package com.cake7.guestbook.config;
 
 import com.cake7.guestbook.filter.JwtAuthenticationFilter;
+import com.cake7.guestbook.filter.PreventDuplicateLoginFilter;
 import com.cake7.guestbook.handler.CustomLogoutSuccessHandler;
 import com.cake7.guestbook.handler.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -31,6 +33,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final PreventDuplicateLoginFilter preventDuplicateLoginFilter;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
     @Bean
@@ -79,8 +82,8 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID", "jwt_token")
                         .permitAll()
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(preventDuplicateLoginFilter, OAuth2AuthorizationRequestRedirectFilter.class);
         return http.build();
     }
 

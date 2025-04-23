@@ -26,7 +26,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
-    private static final Logger logger = LogManager.getLogger(CustomOAuth2UserService.class.getName());
+    private static final Logger logger = LogManager.getLogger();
     private final UserServiceImpl userServiceImpl;
 
     @Override
