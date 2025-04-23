@@ -5,10 +5,13 @@ import com.cake7.guestbook.dto.RefreshTokenResponseDTO;
 import com.cake7.guestbook.exception.TokenException;
 import com.cake7.guestbook.mapper.RefreshTokenMapper;
 import com.cake7.guestbook.mapper.UserMapper;
+import com.cake7.guestbook.oauth.jwt.OAuth2ProviderStrategy;
+import com.cake7.guestbook.oauth.jwt.OAuth2ProviderStrategyFactory;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,14 +27,17 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private final RefreshTokenMapper refreshTokenMapper;
     private final JwtServiceImpl jwtServiceImpl;
     private final UserMapper userMapper;
+    private final OAuth2ProviderStrategyFactory strategyFactory;
 
     @Override
     @Transactional
     public String createRefreshToken(Authentication authentication) throws Exception {
         try {
             OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-            String providerId = oAuth2User.getAttribute("sub");
+            String registrationId = ((OAuth2AuthenticationToken) authentication).getAuthorizedClientRegistrationId();
 
+            OAuth2ProviderStrategy strategy = strategyFactory.getStrategy(registrationId);
+            String providerId = strategy.extractProviderId(oAuth2User);
             String userId = userMapper.findByProviderId(providerId);
 
             String refreshTokenId = UUID.randomUUID().toString();

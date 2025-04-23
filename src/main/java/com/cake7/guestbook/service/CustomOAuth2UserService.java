@@ -2,8 +2,8 @@ package com.cake7.guestbook.service;
 
 import com.cake7.guestbook.domain.User;
 import com.cake7.guestbook.domain.enums.Role;
-import com.cake7.guestbook.oauth.OAuth2UserInfoFactory;
-import com.cake7.guestbook.oauth.Oauth2UserInfo;
+import com.cake7.guestbook.oauth.userInfo.OAuth2UserInfoFactory;
+import com.cake7.guestbook.oauth.userInfo.Oauth2UserInfo;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -57,6 +57,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 .id(UUID.randomUUID().toString())
                 .provider(registrationId)
                 .providerId(providerId)
+                .userNameAttribute(userNameAttribute)
                 .email(email)
                 .name(name)
                 .role(Role.ROLE_USER.name())

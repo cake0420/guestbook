@@ -34,8 +34,8 @@ public interface UserMapper {
                           @Param("updatedAt") ZonedDateTime updatedAt);
 
     @Insert("""
-        INSERT INTO user (id, provider, provider_id, email, name, role, profile_image_url, created_at, updated_at)
-        VALUES (#{id}, #{provider}, #{providerId}, #{email}, #{name}, #{role}, #{profile_image_url}, #{createdAt}, #{updatedAt})
+        INSERT INTO user (id, provider, provider_id, user_name_attribute, email, name, role, profile_image_url, created_at, updated_at)
+        VALUES (#{id}, #{provider}, #{providerId}, #{userNameAttribute}, #{email}, #{name}, #{role}, #{profile_image_url}, #{createdAt}, #{updatedAt})
 """)
     void save(User user);
 }

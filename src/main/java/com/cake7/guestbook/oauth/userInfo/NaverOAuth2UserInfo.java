@@ -1,4 +1,4 @@
-package com.cake7.guestbook.oauth;
+package com.cake7.guestbook.oauth.userInfo;
 
 import java.util.Map;
 
@@ -30,13 +30,4 @@ public class NaverOAuth2UserInfo implements Oauth2UserInfo{
         return (String) attributes.get("profile_image");
     }
 
-    @Override
-    public Map<String, Object> getAttributes() {
-        return Map.of(
-                "id", getId(),
-                "name", getName(),
-                "email", getEmail(),
-                "profile_image", getImageUrl()
-        );
-    }
 }

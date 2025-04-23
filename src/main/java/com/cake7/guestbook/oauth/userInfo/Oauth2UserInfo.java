@@ -1,6 +1,4 @@
-package com.cake7.guestbook.oauth;
-
-import java.util.Map;
+package com.cake7.guestbook.oauth.userInfo;
 
 public interface Oauth2UserInfo {
 
@@ -8,6 +6,4 @@ public interface Oauth2UserInfo {
     String getName();
     String getEmail();
     String getImageUrl();
-
-    Map<String, Object> getAttributes();
 }

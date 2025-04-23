@@ -1,4 +1,4 @@
-package com.cake7.guestbook.oauth;
+package com.cake7.guestbook.oauth.userInfo;
 
 import java.util.Map;
 

@@ -1,4 +1,4 @@
-package com.cake7.guestbook.oauth;
+package com.cake7.guestbook.oauth.userInfo;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,13 +29,4 @@ public class GoogleOAuth2UserInfo implements Oauth2UserInfo{
         return (String) attributes.get("picture");
     }
 
-    @Override
-    public Map<String, Object> getAttributes() {
-        return Map.of(
-                "sub", getId(),
-                "name", getName(),
-                "email", getEmail(),
-                "picture", getImageUrl()
-        );
-    }
 }

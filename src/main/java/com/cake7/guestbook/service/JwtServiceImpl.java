@@ -4,6 +4,8 @@ import com.cake7.guestbook.config.JwtConfig;
 import com.cake7.guestbook.domain.User;
 import com.cake7.guestbook.exception.TokenException;
 import com.cake7.guestbook.mapper.UserMapper;
+import com.cake7.guestbook.oauth.jwt.OAuth2ProviderStrategy;
+import com.cake7.guestbook.oauth.jwt.OAuth2ProviderStrategyFactory;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -29,13 +31,18 @@ public class JwtServiceImpl implements JwtService {
     private final JwtConfig jwtConfig;
     private final UserMapper userMapper;
     private static final Logger logger = LogManager.getLogger();
+    private final OAuth2ProviderStrategyFactory strategyFactory;
 
     @Override
     public String generateAccessToken(Authentication authentication) throws Exception {
         try {
 
             String registrationId = ((OAuth2AuthenticationToken) authentication).getAuthorizedClientRegistrationId();
-            String providerId = getProviderId(authentication,registrationId);
+            OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+
+            OAuth2ProviderStrategy strategy = strategyFactory.getStrategy(registrationId);
+            String providerId = strategy.extractProviderId(oAuth2User);
+
             String authorities = authentication.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.joining(","));
@@ -74,18 +81,14 @@ public class JwtServiceImpl implements JwtService {
             List<SimpleGrantedAuthority> authorities =
                     Collections.singletonList(new SimpleGrantedAuthority(user.getRole()));
 
-            // Create OAuth2User-like attributes for consistency with your existing authentication
-            Map<String, Object> attributes = new HashMap<>();
-            attributes.put("sub", user.getProviderId());
-            attributes.put("name", user.getName());
-            attributes.put("email", user.getEmail());
-            attributes.put("picture", user.getProfile_image_url());
+            OAuth2ProviderStrategy strategy = strategyFactory.getStrategy(user.getProvider());
+            Map<String, Object> attributes = strategy.buildUserAttributes(user);
 
             // Create OAuth2User
             OAuth2User oAuth2User = new DefaultOAuth2User(
                     authorities,
                     attributes,
-                    "sub"
+                    user.getUserNameAttribute()
             );
 
             // Return authentication with OAuth2User as principal
@@ -96,27 +99,4 @@ public class JwtServiceImpl implements JwtService {
             throw new TokenException("Error getting authentication: " + e.getMessage());
         }
     }
-
-    private String getProviderId(Authentication authentication,String registrationId) {
-        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-        switch (registrationId.toLowerCase()) {
-            case "google" -> {
-                logger.debug("Google Login");
-                return oAuth2User.getAttribute("sub");
-            }
-            case "naver" -> {
-                logger.debug("Naver Login");
-                return oAuth2User.getAttribute("response");
-            }
-            case "kakao" -> {
-                logger.debug("Kakao Login");
-                return null;
-            }
-            default -> {
-                logger.error("Invalid registrationId: {}", registrationId);
-                throw new TokenException("Invalid registrationId: " + registrationId);
-            }
-        }
-    }
-
 }
