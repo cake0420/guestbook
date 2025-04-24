@@ -1,8 +1,8 @@
 package com.cake7.guestbook.controller;
 
-import com.cake7.guestbook.dto.RefreshTokenResponseDTO;
-import com.cake7.guestbook.service.RefreshTokenServiceImpl;
-import com.cake7.guestbook.util.JwtUtils;
+import com.cake7.guestbook.common.dto.RefreshTokenResponseDTO;
+import com.cake7.guestbook.common.service.RefreshTokenServiceImpl;
+import com.cake7.guestbook.common.util.JwtUtils;
 import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -1,6 +1,6 @@
 package com.cake7.guestbook.controller;
 
-import com.cake7.guestbook.dto.TestUserDTO;
+import com.cake7.guestbook.common.dto.TestUserDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
