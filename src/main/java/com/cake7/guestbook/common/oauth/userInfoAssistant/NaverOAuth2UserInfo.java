@@ -6,9 +6,16 @@ public class NaverOAuth2UserInfo implements Oauth2UserInfo{
 
     private final Map<String, Object> attributes;
 
+    @SuppressWarnings("unchecked")
     public NaverOAuth2UserInfo(Map<String, Object> attributes) {
-        this.attributes = (Map<String, Object>) attributes.get("response");
+        Object response = attributes.get("response");
+        if (response instanceof Map<?, ?> map) {
+            this.attributes = (Map<String, Object>) map;
+        } else {
+            throw new IllegalArgumentException("Naver OAuth response is not a valid map.");
+        }
     }
+
 
     @Override
     public String getId() {
