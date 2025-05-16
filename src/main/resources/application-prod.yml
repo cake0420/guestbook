@@ -60,3 +60,6 @@ logging:
       cake7:
         guestbook:
           mapper: INFO # mapper 패키지의 로깅 레벨을 DEBUG로 설정 (DEV)
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 3600000
