@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Mapper
@@ -44,4 +45,18 @@ public interface RefreshTokenMapper {
                 WHERE used = true OR expired_at < #{expiredAt}
            \s""")
     void deleteAllUserTokens(ZonedDateTime expiredAt);
+
+    @Select("""
+            SELECT *
+            FROM refresh_token
+            WHERE user_id = #{userId} AND expired_at > #{now} AND used = false
+            ORDER BY created_at
+        """)
+    List<RefreshToken> findByUserAndUsedIsFalseAndExpiredAtAfterOrderByCreatedAtAsc(@Param("userId") String userId, @Param("now") ZonedDateTime now);
+
+    @Delete("""
+        DELETE FROM refresh_token
+        WHERE user_id = #{userId}
+    """)
+    void delete(@Param("userId") String userId);
 }

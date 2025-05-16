@@ -1,12 +1,12 @@
 package com.cake7.guestbook.common.service;
 
-import com.cake7.guestbook.domain.RefreshToken;
 import com.cake7.guestbook.common.dto.RefreshTokenResponseDTO;
 import com.cake7.guestbook.common.exception.TokenException;
-import com.cake7.guestbook.mapper.RefreshTokenMapper;
-import com.cake7.guestbook.mapper.UserMapper;
 import com.cake7.guestbook.common.oauth.jwtAssistant.OAuth2ProviderStrategy;
 import com.cake7.guestbook.common.oauth.jwtAssistant.OAuth2ProviderStrategyFactory;
+import com.cake7.guestbook.domain.RefreshToken;
+import com.cake7.guestbook.mapper.RefreshTokenMapper;
+import com.cake7.guestbook.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -40,8 +41,19 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
             String providerId = strategy.extractProviderId(oAuth2User);
             String userId = userMapper.findByProviderId(providerId);
 
-            String refreshTokenId = UUID.randomUUID().toString();
             ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+
+            List<RefreshToken> activeTokens = refreshTokenMapper
+                    .findByUserAndUsedIsFalseAndExpiredAtAfterOrderByCreatedAtAsc(userId, now);
+
+            final int MAX_TOKENS_PER_USER = 3;
+            if (activeTokens.size() >= MAX_TOKENS_PER_USER) {
+                // 가장 오래된 토큰부터 삭제 (최신 2개만 남김)
+                for (int i = 0; i < activeTokens.size() - (MAX_TOKENS_PER_USER - 1); i++) {
+                    refreshTokenMapper.delete(activeTokens.get(i).getId());
+                }
+            }
+            String refreshTokenId = UUID.randomUUID().toString();
             ZonedDateTime expiresAt = now.plusDays(1);
             RefreshToken refreshToken = RefreshToken.builder()
                     .id(refreshTokenId)
