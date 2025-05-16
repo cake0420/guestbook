@@ -16,9 +16,12 @@ public class NaverOAuth2Strategy implements OAuth2ProviderStrategy {
 
     @Override
     public Map<String, Object> buildUserAttributes(User user) {
-        return Map.of("id", user.getProviderId(),
-                    "name", user.getName(),
-                    "email", user.getEmail(),
-                    "profile_image", user.getProfile_image_url());
+        Map<String, Object> response = Map.of(
+                "id", user.getProviderId(),
+                "name", user.getName(),
+                "profile_image", user.getProfile_image_url()
+        );
+
+        return Map.of("response", response);
     }
 }
